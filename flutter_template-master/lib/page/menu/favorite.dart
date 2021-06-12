@@ -81,7 +81,40 @@ class _FavoritePageState extends State<FavoritePage> {
           ),
           body:RefreshIndicator(
             onRefresh: () async {
-              cloudbase();
+              //添加到腾讯云数据库
+              CloudBaseCore core = CloudBaseCore.init({
+                // 填写您的云开发 env
+                'env': 'msy-cloudbase-7gfbkzxjbdb5cdd8',
+                // 填写您的移动应用安全来源凭证
+                // 生成凭证的应用标识必须是 Android 包名或者 iOS BundleID
+                'appAccess': {
+                  // 凭证
+                  'key': '875f3415dda065fbab764a906c4d3c09',
+                  // 版本
+                  'version': '1'
+                }
+              });
+              CloudBaseAuth auth = CloudBaseAuth(core);
+              await auth.signInAnonymously().then((success) {
+                // 登录成功
+                print("连接上腾讯云 success");
+              }).catchError((err) {
+                // 登录失败
+                print(err);
+              });
+              CloudBaseDatabase db = CloudBaseDatabase(core);
+              Collection collection = db.collection('collection');
+                collection.where({
+                  "username": value.nickName
+                }).get().then((res) {
+                  print(res.data);
+                  setState(() {
+                    this.list = res.data;
+                  });
+                  print(list);
+                }).catchError((e) {
+                  print("获取数据失败");
+                });
             },
             child:
                 ListView.separated(

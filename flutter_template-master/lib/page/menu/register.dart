@@ -224,11 +224,7 @@ class _RegisterPageState extends State<RegisterPage> {
         // 登录失败
         print(err);
       });
-      // await auth.getUserInfo().then((userInfo) {
-      //   print(userInfo);
-      // }).catchError((err) {
-      //   // 获取用户信息失败
-      // });
+
       CloudBaseDatabase db = CloudBaseDatabase(core);
       Collection collection = db.collection('user');
       collection.where({
@@ -262,24 +258,7 @@ class _RegisterPageState extends State<RegisterPage> {
           });
         }
       });
-      //
-      //   XHttp.post("/user/register", {
-      //     "username": _unameController.text,
-      //     "password": _pwdController.text,
-      //     "repassword": _pwdRepeatController.text
-      //   }).then((response) {
-      //     Navigator.pop(context);
-      //     if (response['errorCode'] == 0) {
-      //       ToastUtils.toast(I18n.of(context).registerSuccess);
-      //       Navigator.of(context).pop();
-      //     } else {
-      //       ToastUtils.error(response['errorMsg']);
-      //     }
-      //   }).catchError((onError) {
-      //     Navigator.of(context).pop();
-      //     ToastUtils.error(onError);
-      //   });
-      // }
+
     }
   }
 }

@@ -4,16 +4,11 @@ import 'package:cloudbase_core/cloudbase_core.dart';
 import 'package:cloudbase_database/cloudbase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_template/generated/i18n.dart';
 import 'package:flutter_template/utils/provider.dart';
 import 'package:provider/provider.dart';
-import 'FriendCell.dart';
 import 'editcomment.dart';
-import 'friendmodel_entity.dart';
-import 'package:flutter_template/style/theme.dart' as Style;
 
-import 'newcomment.dart';
 
 class MyCommentPage extends StatefulWidget {
   List list;
@@ -85,55 +80,43 @@ class _MyCommentPageState extends State<MyCommentPage> {
               .of(context)
               .comment),
         ),
-        // body: Stack(
-        //   children: <Widget>[
-        //     ListView(
-        //       padding: EdgeInsets.only(top: 0),
-        //       controller: _scrollController,
-        //       children: <Widget>[
-        //         Container(
-        //           height: 220,
-        //           color: Color(0XFFFEFFFE),
-        //           child: Stack(
-        //             children: <Widget>[
-        //               Positioned(
-        //                   left: 0,
-        //                   right: 0,
-        //                   top: 0,
-        //                   bottom: 0,
-        //
-        //                   child: Image.network("https://image.tmdb.org/t/p/original/" + img , fit: BoxFit.fill,)
-        //               ),
-        //               Positioned(
-        //                 right: 20,
-        //                 bottom: 20,
-        //                 child: Text(title  ,
-        //                   style: TextStyle(
-        //                       fontSize: 16 ,
-        //                       fontWeight: FontWeight.w600 ,
-        //                       color: Colors.white ,
-        //                       shadows:[
-        //                         Shadow(color: Colors.black, offset: Offset(1, 1))
-        //                       ]
-        //                   ),
-        //                 ),
-        //               )
-        //
-        //             ],
-        //           ),
-        //         ),
-        //
-        //       ],
-        //     ),
-        //
-        //   ],
-        //
-        //
-        // ),
         body:
         RefreshIndicator(
           onRefresh: () async {
-            cloudbase();
+            //添加到腾讯云数据库
+            CloudBaseCore core = CloudBaseCore.init({
+              // 填写您的云开发 env
+              'env': 'msy-cloudbase-7gfbkzxjbdb5cdd8',
+              // 填写您的移动应用安全来源凭证
+              // 生成凭证的应用标识必须是 Android 包名或者 iOS BundleID
+              'appAccess': {
+                // 凭证
+                'key': '875f3415dda065fbab764a906c4d3c09',
+                // 版本
+                'version': '1'
+              }
+            });
+            CloudBaseAuth auth = CloudBaseAuth(core);
+            await auth.signInAnonymously().then((success) {
+              // 登录成功
+              print("连接上腾讯云 success");
+            }).catchError((err) {
+              // 登录失败
+              print(err);
+            });
+            CloudBaseDatabase db = CloudBaseDatabase(core);
+            Collection collection = db.collection('review');
+              collection.where({
+                "username": value.nickName
+              }).get().then((res) {
+                print(res.data);
+                setState(() {
+                  this.list = res.data;
+                });
+                print(list);
+              }).catchError((e) {
+                print("获取数据失败");
+              });
           },
           child:
           ListView.separated(
